@@ -3,7 +3,6 @@
 class sha1base_filesystem extends sha1base
 {
 	public $filesFolder = '../../files/';
-	public $importFolder = '../../files_import/';
 	public $namesFolder = '../../files_names/';	
 	
 	public function __construct()
@@ -13,24 +12,28 @@ class sha1base_filesystem extends sha1base
 	
 	public function addFile($file)
 	{
-		if(file_exists($this->importFolder . $file))
+		//1) import sucessful
+		//2) copying failed
+		//3) file did exist
+		//4) import file did not exist
+		if(file_exists($file))
 		{
-			$hash = @sha1_file($this->importFolder . $file);
+			$hash = @sha1_file($file);
 			if ($this->hashExists($hash) != true)
 			{
-				if(rename($this->importFolder . $file, $this->filesFolder . $hash))
+				if(rename($file, $this->filesFolder . $hash))
 				{
-					file_put_contents($this->namesFolder . $hash, $file);
-					return 4;
+					file_put_contents($this->namesFolder . $hash, basename($file));
+					return array(1, $hash);
 				} else {
-					return 3;
+					return array(3, 'copying failed');
 				}
 			} else {
-				unlink($this->importFolder . $file);
-				return 2;
+				unlink($file);
+				return array(2, $hash);
 			}
 		} else {
-			return 1;
+			return array(4, 'file not found');
 		}
 	}
 	
@@ -54,11 +57,12 @@ class sha1base_filesystem extends sha1base
 	
 	public function getName($hash)
 	{
+		$fname = 'unkown';
 		if(file_exists($this->namesFolder . $hash))
 		{
-			
+			$fname = @file_get_contents($this->namesFolder . $hash);
 		}
-		return 'temp_name';
+		return $fname;
 	}
 }
 

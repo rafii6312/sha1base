@@ -12,7 +12,7 @@ class sha1base
             return $this->_data[$name];
         }
     }
-
+	
     public function __set($name, $value) {  }
     
 	public function __construct() {  }

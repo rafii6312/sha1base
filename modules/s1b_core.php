@@ -41,12 +41,12 @@ class sha1base
 	
 	public function moduleLoaded($modName)
 	{
-		$e = 0;
+		$e = false;
 		foreach($this->extensionsNames as $mod)
 		{
 			if($mod == $modName)
 			{
-				$e = 1;
+				$e = true;
 			}
 		}
 		return $e;
@@ -74,7 +74,8 @@ class sha1base
 	
 	public function getExtVar($extName, $attr)
 	{ 
-		$i = 0; $ret = null; 
+		$i = 0;
+		$ret = null; 
 		foreach($this->extensions as $ext) 
 		{ 
 			if($this->extensionsNames[$i] == $extName) 

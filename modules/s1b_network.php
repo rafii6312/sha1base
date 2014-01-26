@@ -4,6 +4,8 @@ class sha1base_network extends sha1base
 {
 	public $maxDl; //max download speed in B/s
 	public $maxUploadSize; //max upload size in bytes
+	public $filesFolder;
+	public $namesFolder;
 	
 	public function __construct()
 	{
@@ -26,11 +28,13 @@ class sha1base_network extends sha1base
 		return $status;
 	}
 	
+	
 	public function startDl($att)
 	{
 		if(file_exists($this->filesFolder . $att[0]) AND ($att[0] != ''))
 		{
-			$name = $this->callExtFunction('sha1base_filesystem', 'getName', $att[0]);
+			//$name = $this->callExtFunction('sha1base_filesystem', 'getName', $att[0]);
+			$name = $att[2];
 			$type = $this->callExtFunction('sha1base_media', 'mime_content_type', $this->filesFolder . $att[0]);
 			header("Content-Type: $type");
 			header("Content-Disposition: attachment; filename=\"$name\"");
@@ -38,7 +42,7 @@ class sha1base_network extends sha1base
 			
 			$fp = fopen($this->filesFolder . $att[0], "r");
 			$this->callOnDownloadStart($att[0]);
-			if($att[2] != 0)
+			if($att[1] != 0)
 			{
 				$sleepTime = (65536 * 1000000) / ($att[2]);
 			} else {

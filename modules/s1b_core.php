@@ -87,9 +87,10 @@ class sha1base
 		return $ret;
 	}
 	
-	public function setExtVar($extName, $attr, $value)
+	public function setExtVar($extName, $attr, $value, $index = false)
 	{ 
-		$i = 0; $ret = null; 
+		$i = 0;
+		$ret = null; 
 		foreach($this->extensions as $ext) 
 		{ 
 			if($this->extensionsNames[$i] == $extName) 

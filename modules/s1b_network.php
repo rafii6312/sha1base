@@ -44,7 +44,7 @@ class sha1base_network extends sha1base
 			$this->callOnDownloadStart($att[0]);
 			if($att[1] != 0)
 			{
-				$sleepTime = (65536 * 1000000) / ($att[2]);
+				$sleepTime = (65536 * 1000000) / ($att[1]);
 			} else {
 				$sleepTime = (65536 * 1000000) / ($this->maxDl);
 			}
@@ -56,10 +56,10 @@ class sha1base_network extends sha1base
 				$this->callOnDownloadChunk($att[0]);
 			}
 			fclose($fp);
-			$this->callOnDownloadFinish($hash, 1);
+			$this->callOnDownloadFinish($att[0], 1);
 			return true;
 		} else {
-			$this->callOnDownloadFinish($hash, 2);
+			$this->callOnDownloadFinish($att[0], 2);
 			return false;
 		}
 	}

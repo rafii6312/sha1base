@@ -4,8 +4,10 @@ class sha1base_encrypt extends sha1base
 {
 	public $encryption = MCRYPT_RIJNDAEL_256;
 	public $mode = MCRYPT_MODE_CBC;
-    public $pass = 'testa';
-	public $salt = '?anything!';
+    public $pass = 'test';
+	public $salt = '';
+	public $delete = true;
+	public $useMD5 = true;
 	
 	public function __construct()
 	{
@@ -16,7 +18,13 @@ class sha1base_encrypt extends sha1base
     {
         $td = mcrypt_module_open($this->encryption, '', $this->mode, '');
         $iv = mcrypt_create_iv(mcrypt_enc_get_iv_size($td), MCRYPT_RAND);
-        mcrypt_generic_init($td, (($this->pass . $this->salt)), $iv);
+        
+		if($this->useMD5)
+		{
+			mcrypt_generic_init($td, (md5($this->pass . $this->salt)), $iv);
+		} else {
+			mcrypt_generic_init($td, (($this->pass . $this->salt)), $iv);
+		}
         $crypttext = mcrypt_generic($td, $plaintext);
         mcrypt_generic_deinit($td);
         return base64_encode($iv.$crypttext);
@@ -32,10 +40,16 @@ class sha1base_encrypt extends sha1base
         $crypttext = substr($crypttext, $ivsize);
         if ($iv)
         {
-            mcrypt_generic_init($td, (($this->pass . $this->salt)), $iv);
+			if($this->useMD5)
+			{
+				mcrypt_generic_init($td, (md5($this->pass . $this->salt)), $iv);
+			} else {
+				mcrypt_generic_init($td, (($this->pass . $this->salt)), $iv);
+			}
             $plaintext = mdecrypt_generic($td, $crypttext);
         }
-        return trim($plaintext);
+        //return trim($plaintext);
+		return $plaintext;
     }
 	
 	public function encrypt_file($file)
@@ -46,12 +60,19 @@ class sha1base_encrypt extends sha1base
 			$outp = $file[1];
 			if(file_exists($inp))
 			{
-				file_put_contents($outp, base64_decode($this->encrypt(base64_encode(file_get_contents($inp)))));
+				//file_put_contents($outp, base64_decode($this->encrypt(base64_encode(file_get_contents($inp)))));
+				file_put_contents($outp, ($this->encrypt(base64_encode(file_get_contents($inp)))));
+				
+				if($this->delete)
+				{
+					unlink($inp);
+				}
+				return true;
 			} else {
-				echo 'inp does not exist';
+				return false;
 			}
 		} else {
-			echo 'wrong supply of args';
+			return false;
 		}
 	}
 	
@@ -101,18 +122,31 @@ class sha1base_encrypt extends sha1base
 		{
 			$name = basename($file);
 			$type = $this->callExtFunction('sha1base_media', 'mime_content_type', $file);
-			$speed = 500 * 1024;
+			$speed = 500 * 1024 * 1024;
+			//$fstring = base64_decode($this->decrypt(base64_encode(file_get_contents($file))));
+			$fstring = ($this->decrypt(base64_encode(file_get_contents($file))));
+			
+			if (function_exists('mb_strlen'))
+			{
+				$size = mb_strlen($fstring, '8bit');
+			} else {
+				$size = strlen($fstring);
+			}
+			
+			$size = 619198;
 			header("Content-Type: $type");
 			header("Content-Disposition: attachment; filename=\"$name\"");
-			header("Content-Length: " . filesize($file));
+			//header("Content-Length: " . $size);
 			
-			$fp = fopen($this->filesFolder . $file, "r");
+			$fp = fopen($file, "r");
 			//$this->callOnDownloadStart($file);		
 			$sleepTime = (65536 * 1000000) / $speed;
 			
 			while (!feof($fp))
 			{
-				echo base64_decode($this->decrypt(base64_encode(fread($fp, 65536)))); //64kb parts
+				//echo base64_decode($this->decrypt(base64_encode(fread($fp, 65536))));
+				echo base64_decode($this->decrypt(base64_encode(fread($fp, 65536))));
+				
 				flush();
 				usleep($sleepTime); //wait after each 64kb. 2000000 = 2 sec
 				//$this->callOnDownloadChunk($att[0]);

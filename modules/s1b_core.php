@@ -83,9 +83,14 @@ class sha1base
 				$ret = $this->extensions[$i]->$attr; 
 				break; 
 			} 
-				$i++; 
+			$i++; 
 		}
 		return $ret;
+	}
+	
+	public function gEV($extName, $attr)
+	{
+		$this->getExtVar($extName, $attr);
 	}
 	
 	public function setExtVar($extName, $attr, $value, $index = false)
@@ -103,10 +108,16 @@ class sha1base
 				}
 				break; 
 			} 
-				$i++; 
+			$i++; 
 		}
 		return $ret;
 	}
+	
+	public function sEV($extName, $attr, $value, $index = false)
+	{ 
+		$this->setExtVar($extName, $attr, $value, $index);
+	}
+	
 }
 
 ?>

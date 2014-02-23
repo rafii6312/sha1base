@@ -85,11 +85,12 @@ class sha1base_encrypt extends sha1base
 			if(file_exists($inp))
 			{
 				file_put_contents($outp, base64_decode($this->decrypt(base64_encode(file_get_contents($inp)))));
+				return true;
 			} else {
-				echo 'inp does not exist';
+				return false;
 			}
 		} else {
-			echo 'wrong supply of args';
+			return false;
 		}
 	}
 	
@@ -116,6 +117,7 @@ class sha1base_encrypt extends sha1base
 		}
 	}
 	
+	/*
 	public function startDl($file)
 	{
 		if(file_exists($file))
@@ -152,6 +154,22 @@ class sha1base_encrypt extends sha1base
 				//$this->callOnDownloadChunk($att[0]);
 			}
 			fclose($fp);
+		}
+	}
+	*/
+	
+	public function startDl($file)
+	{
+		if(file_exists($file))
+		{
+			
+			$name = basename($file);
+			$tempfile = $name . '_' . rand(1, 9999999);
+			if($this->decrypt_file(array($file, $tempfile)))
+			{
+				$this->cEF('sha1base_network','startDl', array($tempfile, 1024 * 1024, $name));
+				unlink($tempfile);
+			}
 		}
 	}
 }

@@ -62,6 +62,7 @@ class sha1base_network extends sha1base
 			return false;
 		}
 	}
+
 	
 	function callOnDownloadChunk($hash)
 	{

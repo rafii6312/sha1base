@@ -16,7 +16,7 @@ class sha1base_encrypt extends sha1base
     {
         $td = mcrypt_module_open($this->encryption, '', $this->mode, '');
         $iv = mcrypt_create_iv(mcrypt_enc_get_iv_size($td), MCRYPT_RAND);
-        mcrypt_generic_init($td, (md5($this->pass)), $iv);
+        mcrypt_generic_init($td, (($this->pass . $this->salt)), $iv);
         $crypttext = mcrypt_generic($td, $plaintext);
         mcrypt_generic_deinit($td);
         return base64_encode($iv.$crypttext);
@@ -32,7 +32,7 @@ class sha1base_encrypt extends sha1base
         $crypttext = substr($crypttext, $ivsize);
         if ($iv)
         {
-            mcrypt_generic_init($td, (md5($this->pass)), $iv);
+            mcrypt_generic_init($td, (($this->pass . $this->salt)), $iv);
             $plaintext = mdecrypt_generic($td, $crypttext);
         }
         return trim($plaintext);
@@ -92,6 +92,32 @@ class sha1base_encrypt extends sha1base
 			}
 		} else {
 			return array(4, 'file not found');
+		}
+	}
+	
+	public function startDl($file)
+	{
+		if(file_exists($file))
+		{
+			$name = basename($file);
+			$type = $this->callExtFunction('sha1base_media', 'mime_content_type', $file);
+			$speed = 500 * 1024;
+			header("Content-Type: $type");
+			header("Content-Disposition: attachment; filename=\"$name\"");
+			header("Content-Length: " . filesize($file));
+			
+			$fp = fopen($this->filesFolder . $file, "r");
+			//$this->callOnDownloadStart($file);		
+			$sleepTime = (65536 * 1000000) / $speed;
+			
+			while (!feof($fp))
+			{
+				echo base64_decode($this->decrypt(base64_encode(fread($fp, 65536)))); //64kb parts
+				flush();
+				usleep($sleepTime); //wait after each 64kb. 2000000 = 2 sec
+				//$this->callOnDownloadChunk($att[0]);
+			}
+			fclose($fp);
 		}
 	}
 }

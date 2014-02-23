@@ -7,7 +7,7 @@ class sha1base_filesystem extends sha1base
 	
 	public function __construct()
 	{
-
+		
 	}
 	
 	public function addFile($file)
@@ -42,8 +42,10 @@ class sha1base_filesystem extends sha1base
 		$hash_exists = false;
 		if ($handle = opendir($this->filesFolder))
 		{
-			while (false !== ($file = readdir($handle))) {
-				if ($file != "." && $file != "..") {
+			while (false !== ($file = readdir($handle)))
+			{
+				if ($file != "." && $file != "..")
+				{
 					if ($file == $hash)
 					{
 						$hash_exists = true;
@@ -57,12 +59,21 @@ class sha1base_filesystem extends sha1base
 	
 	public function getName($hash)
 	{
-		$fname = 'unkown';
+		$fname = 'unknown';
 		if(file_exists($this->namesFolder . $hash))
 		{
 			$fname = @file_get_contents($this->namesFolder . $hash);
 		}
 		return $fname;
+	}
+	
+	public function readFile($file)
+	{
+		if(file_exists($this->filesFolder . $file))
+		{
+			return base64_encode(file_get_contents($this->filesFolder . $file));
+		}
+		return false;
 	}
 }
 

@@ -5,8 +5,7 @@ class sha1base_network extends sha1base
 	public $maxDl; //max download speed in B/s
 	public $maxUploadSize; //max upload size in bytes
 	public $filesFolder;
-	public $namesFolder;
-	
+
 	public function __construct()
 	{
 

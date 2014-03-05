@@ -1,14 +1,11 @@
 <?php
 error_reporting(E_ALL);
 include_once('s1b_core.php');
+include_once('config.php');
 $m = new sha1base();
-$m->loadModule('s1b_mysql', 'sha1base_mysql');
-$m->loadModule('s1b_mysqli', 'sha1base_mysqli');
-$m->loadModule('s1b_sqlite', 'sha1base_sqlite');
 $m->loadModule('s1b_filesystem', 'sha1base_filesystem');
 $m->loadModule('s1b_network', 'sha1base_network');
 $m->loadModule('s1b_media', 'sha1base_media');
-$m->loadModule('s1b_location', 'sha1base_location');
 $m->loadModule('s1b_encrypt', 'sha1base_encrypt');
 
 

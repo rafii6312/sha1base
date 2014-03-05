@@ -1,0 +1,1 @@
+DELETE ALL FROM files WHERE hash LIKE '%'

@@ -4,14 +4,27 @@ class sha1base_encrypt extends sha1base
 {
 	public $encryption = MCRYPT_RIJNDAEL_256;
 	public $mode = MCRYPT_MODE_CBC;
-    public $pass = 'test';
+    public $pass = 'default';
 	public $salt = '';
 	public $delete = true;
-	public $useMD5 = true;
+	public $useMD5 = false;
+	public $bufferSize = 1024; //67108864
+	public $bufferSizeOut = 1408; //64 mb
+	
 	
 	public function __construct()
 	{
+		
+	}
 	
+	public function randomString($length = 10)
+	{
+		$characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+		$randomString = '';
+		for ($i = 0; $i < $length; $i++) {
+			$randomString .= $characters[rand(0, strlen($characters) - 1)];
+		}
+		return $randomString;
 	}
 	
 	public function encrypt($plaintext)
@@ -48,8 +61,7 @@ class sha1base_encrypt extends sha1base
 			}
             $plaintext = mdecrypt_generic($td, $crypttext);
         }
-        //return trim($plaintext);
-		return $plaintext;
+        return trim($plaintext);
     }
 	
 	public function encrypt_file($file)
@@ -60,8 +72,19 @@ class sha1base_encrypt extends sha1base
 			$outp = $file[1];
 			if(file_exists($inp))
 			{
-				//file_put_contents($outp, base64_decode($this->encrypt(base64_encode(file_get_contents($inp)))));
-				file_put_contents($outp, ($this->encrypt(base64_encode(file_get_contents($inp)))));
+				$fp = fopen($inp, "r");
+				if(file_exists($outp)) unlink($outp);
+				$chunksize = $this->bufferSize;
+				while (!feof($fp))
+				{
+					$raw = fread($fp, $chunksize);
+					$part = base64_encode($raw); 
+					$epart = base64_decode($this->encrypt($part));
+					
+					file_put_contents($outp, $epart, FILE_APPEND | LOCK_EX);
+				}
+				fclose($fp);
+				
 				
 				if($this->delete)
 				{
@@ -84,7 +107,19 @@ class sha1base_encrypt extends sha1base
 			$outp = $file[1];
 			if(file_exists($inp))
 			{
-				file_put_contents($outp, base64_decode($this->decrypt(base64_encode(file_get_contents($inp)))));
+				if(file_exists($outp)) unlink($outp);
+				//file_put_contents($outp, base64_decode($this->decrypt(file_get_contents($inp)))); // does work but loads file in memory
+				
+				$chunksize = $this->bufferSizeOut;
+				$fp = fopen($inp, "r");
+				while (!feof($fp))
+				{
+					$part = base64_encode(fread($fp, $chunksize));
+					$epart = base64_decode($this->decrypt($part));
+					file_put_contents($outp, $epart, FILE_APPEND | LOCK_EX);
+				}
+				fclose($fp);
+				
 				return true;
 			} else {
 				return false;
@@ -92,86 +127,7 @@ class sha1base_encrypt extends sha1base
 		} else {
 			return false;
 		}
-	}
-	
-	public function addFile($file)
-	{
-		$filesFolder = "";
-		if(file_exists($file))
-		{
-			$hash = @sha1_file($file);
-			if ($this->hashExists($hash) != true)
-			{
-				if(rename($file, $filesFolder . $hash))
-				{
-					return array(1, $hash);
-				} else {
-					return array(3, 'copying failed');
-				}
-			} else {
-				unlink($file);
-				return array(2, $hash);
-			}
-		} else {
-			return array(4, 'file not found');
-		}
-	}
-	
-	/*
-	public function startDl($file)
-	{
-		if(file_exists($file))
-		{
-			$name = basename($file);
-			$type = $this->callExtFunction('sha1base_media', 'mime_content_type', $file);
-			$speed = 500 * 1024 * 1024;
-			//$fstring = base64_decode($this->decrypt(base64_encode(file_get_contents($file))));
-			$fstring = ($this->decrypt(base64_encode(file_get_contents($file))));
-			
-			if (function_exists('mb_strlen'))
-			{
-				$size = mb_strlen($fstring, '8bit');
-			} else {
-				$size = strlen($fstring);
-			}
-			
-			$size = 619198;
-			header("Content-Type: $type");
-			header("Content-Disposition: attachment; filename=\"$name\"");
-			//header("Content-Length: " . $size);
-			
-			$fp = fopen($file, "r");
-			//$this->callOnDownloadStart($file);		
-			$sleepTime = (65536 * 1000000) / $speed;
-			
-			while (!feof($fp))
-			{
-				//echo base64_decode($this->decrypt(base64_encode(fread($fp, 65536))));
-				echo base64_decode($this->decrypt(base64_encode(fread($fp, 65536))));
-				
-				flush();
-				usleep($sleepTime); //wait after each 64kb. 2000000 = 2 sec
-				//$this->callOnDownloadChunk($att[0]);
-			}
-			fclose($fp);
-		}
-	}
-	*/
-	
-	public function startDl($file)
-	{
-		if(file_exists($file))
-		{
-			
-			$name = basename($file);
-			$tempfile = $name . '_' . rand(1, 9999999);
-			if($this->decrypt_file(array($file, $tempfile)))
-			{
-				$this->cEF('sha1base_network','startDl', array($tempfile, 1024 * 1024, $name));
-				unlink($tempfile);
-			}
-		}
-	}
+	}	
 }
 
 

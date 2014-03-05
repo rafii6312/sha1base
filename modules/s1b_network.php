@@ -4,7 +4,7 @@ class sha1base_network extends sha1base
 {
 	public $maxDl; //max download speed in B/s
 	public $maxUploadSize; //max upload size in bytes
-	public $filesFolder = '';
+	public $filesFolder;
 
 	public function __construct()
 	{
@@ -32,6 +32,9 @@ class sha1base_network extends sha1base
 	{
 		if(file_exists($this->filesFolder . $att[0]) AND ($att[0] != ''))
 		{
+			// 0) filename
+			// 1) speed in byte/sec
+			// 2) name shown
 			//$name = $this->callExtFunction('sha1base_filesystem', 'getName', $att[0]);
 			$name = $att[2];
 			$type = $this->callExtFunction('sha1base_media', 'mime_content_type', $this->filesFolder . $att[0]);

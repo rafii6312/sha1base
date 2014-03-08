@@ -1,4 +1,5 @@
 <?php 
+error_reporting(0);
 
 $maxUploadSize = 80 * 1024 * 1024; //50mb
 $maxDownloadSpeed = 1 *1024 * 1024; //1mb/s

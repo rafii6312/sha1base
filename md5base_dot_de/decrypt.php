@@ -1,5 +1,5 @@
 <?php
-error_reporting(E_ALL);
+
 ignore_user_abort(TRUE);
 include_once('s1b_core.php');
 include_once('config.php');
@@ -14,15 +14,18 @@ $m->loadModule('s1b_encrypt', 'sha1base_encrypt');
 
 if(isset($_POST['id']) AND isset($_POST['pass']))
 {
-	if(strlen($_POST['pass']) < 1)
+	$id = preg_replace('/[^a-zA-Z0-9]/', "", $_POST['id']);
+	$pass = preg_replace('/[^a-zA-Z0-9]/', "", $_POST['pass']);
+	
+	if(strlen($pass) < 1)
 	{
 		echo 'error, no pass was submit';
 		exit;
 	}
 
 	$dec = $tempFolder . rand(1,10000000);
-	$m->setExtVar('sha1base_encrypt', 'pass', ($_POST['pass']));
-	if(!$m->cEF('sha1base_encrypt', 'decrypt_file',array($filesFolder . preg_replace('/[^a-zA-Z0-9]/', "", $_POST['id']), $dec)))
+	$m->setExtVar('sha1base_encrypt', 'pass', ($pass));
+	if(!$m->cEF('sha1base_encrypt', 'decrypt_file',array($filesFolder . $id, $dec)))
 	{
 		echo 'error while decrypting!';
 		exit;
@@ -31,12 +34,9 @@ if(isset($_POST['id']) AND isset($_POST['pass']))
 	@unlink($dec);
 } elseif(isset($_POST['fastdl']) OR isset($_GET['fastdl']))
 {
-	if(isset($_GET['fastdl']))
-	{
-		$fdl = $_GET['fastdl'];
-	} else {
-		$fdl = $_POST['fastdl'];
-	}
+	if(isset($_GET['fastdl'])) $fdl = base64_decode($_GET['fastdl']);
+	if(isset($_POST['fastdl'])) $fdl = base64_decode($_POST['fastdl']);
+	
 	
 	$fdlp = explode('|', $fdl);
 	if(count($fdlp) == 3)

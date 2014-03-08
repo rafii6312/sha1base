@@ -107,6 +107,7 @@ if(preg_match('/(alcatel|amoi|android|avantgo|blackberry|benq|cell|cricket|docom
 		</script>
 		<script type="text/javascript" src="js/jquery-1.10.2.min.js"></script>
 		<script type="text/javascript" src="js/jquery.form.min.js"></script>
+		<meta name="google-site-verification" content="SEbaql24pNuHHgq4cMIRh5I5qSRQDuQ53aPjagQYw9o" />
 	</head>
 	<body onload="viewPage()">
 		<div id="everything" style="display:none;">
@@ -164,7 +165,7 @@ if(preg_match('/(alcatel|amoi|android|avantgo|blackberry|benq|cell|cricket|docom
 				<div class="submit-container">
 				<input class="submit-button" type="submit" value="Submit" />
 				</div>
-				<small>FastDL codes contain id,pass and filename. E.g. <i>aaa|bbb|something.jpg</i>. Due to its containing pass they are insecure but easy to share</small>
+				<small>FastDL codes contain id,pass and filename. E.g. <i>aaa|bbb|something.jpg</i> (base64). Due to its containing pass they are insecure but easy to share</small>
 				</form>
 		<br>
 		

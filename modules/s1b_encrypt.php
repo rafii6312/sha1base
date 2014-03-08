@@ -17,6 +17,11 @@ class sha1base_encrypt extends sha1base
 		
 	}
 	
+	public function setPass($p)
+	{
+		$this->pass = $p;
+	}
+	
 	public function randomString($length = 10)
 	{
 		$characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';

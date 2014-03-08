@@ -1,5 +1,5 @@
 <?php
-error_reporting(E_ALL);
+
 include_once('s1b_core.php');
 include_once('config.php');
 $m = new sha1base();
@@ -10,6 +10,7 @@ $m->loadModule('s1b_encrypt', 'sha1base_encrypt');
 
 
 $pass = $m->cEF('sha1base_encrypt', 'randomString', '16');
+//$m->cEF('sha1base_encrypt', 'setPass', $pass);
 $m->setExtVar('sha1base_encrypt', 'pass', $pass);
 
 
@@ -41,34 +42,7 @@ if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $source_path)) {
 		$filename = str_replace('|', '', $_FILES['uploadedfile']['name']);
 		$filename = str_replace('$', '', $filename);
 		
-		
-		echo $hash . '$' . $pass . '$' . ($hash . '|' . $pass . '|' . $filename);
-		
-		/*
-		?>
-		<center>
-			<table>
-				<tr>
-					<td><b>ID</b></td>
-					<td><?php echo $hash; ?></td>
-				</tr>
-				<tr>
-					<td><b>Pass</b></td>
-					<td><?php echo $pass; ?></td>
-				</tr>
-				<tr>
-					<td><b>FastDL</b></td>
-					<td><?php echo $hash . '|' . $pass . '|' . $filename; ?></td>
-				</tr>
-				<tr>
-					<td></td>
-					<td>CASE SENSITIVE!</td>
-				</tr>
-			</table>
-		</center>
-		<?php
-		*/
-		
+		echo $hash . '$' . $pass . '$' . base64_encode($hash . '|' . $pass . '|' . $filename); 
 		
 		
 	} else {

@@ -40,6 +40,8 @@ class sha1base_login extends sha1base
 		if($this->isLoggedIn())
 		{
 			return $_SESSION['s1buser'];
+		} else {
+			return false;
 		}
 	}
 	

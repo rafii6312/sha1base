@@ -19,11 +19,17 @@ class sha1base
 	
 	public function loadModule($modFile, $constructor, $outp = false)
 	{
-		if(file_exists($modFile . '.php'))
+		if(file_exists($modFile . '.php') OR file_exists($modFile))
 		{
 			try
 			{
-				include($modFile . '.php');
+				if(!file_exists($modFile))
+				{
+					include($modFile . '.php');
+				} else {
+					include($modFile);
+				}
+				
 				if ($outp) echo '<b>' . $modFile . '</b> successful loaded.<br>';
 				array_push($this->extensions, new $constructor());
 				array_push($this->extensionsNames, $constructor);

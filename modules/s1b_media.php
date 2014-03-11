@@ -8,6 +8,11 @@ class sha1base_media extends sha1base
 
 	}
 	
+	public function getMime($filename)
+	{
+		return $this->mime_content_type($filename);
+	}
+	
 	public function mime_content_type($filename) {
         $mime_types = array(
             'txt' => 'text/plain',

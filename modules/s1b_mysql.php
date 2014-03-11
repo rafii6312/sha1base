@@ -14,8 +14,13 @@ class sha1base_mysql extends sha1base
 	{
 		try
 		{
-			$this->mysql_db = mysql_connect($args[0], $args[1], $args[2], $args[3]) or die("Error " . mysql_error($this->mysql_db));
-			return true;
+			if(count($args) == 3)
+			{
+				$this->mysql_db = mysql_connect($args[0], $args[1], $args[2]);
+				return true;
+			} else {
+				return false;
+			}
 		} catch (Exception $e)
 		{
 			return false;

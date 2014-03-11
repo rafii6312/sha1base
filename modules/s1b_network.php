@@ -4,7 +4,6 @@ class sha1base_network extends sha1base
 {
 	public $maxDl; //max download speed in B/s
 	public $maxUploadSize; //max upload size in bytes
-	public $filesFolder;
 
 	public function __construct()
 	{
@@ -18,7 +17,7 @@ class sha1base_network extends sha1base
 		$stoptime  = microtime(true);
 		$status    = 0;
 
-		if (!$file) $status = 999;
+		if (!$file) $status = false;
 		else {
 			fclose($file);
 			$status = ($stoptime - $starttime) * 1000;
@@ -30,19 +29,19 @@ class sha1base_network extends sha1base
 	
 	public function startDl($att)
 	{
-		if(file_exists($this->filesFolder . $att[0]) AND ($att[0] != ''))
+		if(file_exists($att[0]) AND ($att[0] != ''))
 		{
 			// 0) filename
 			// 1) speed in byte/sec
 			// 2) name shown
 			//$name = $this->callExtFunction('sha1base_filesystem', 'getName', $att[0]);
 			$name = $att[2];
-			$type = $this->callExtFunction('sha1base_media', 'mime_content_type', $this->filesFolder . $att[0]);
+			$type = $this->callExtFunction('sha1base_media', 'mime_content_type', $att[0]);
 			header("Content-Type: $type");
 			header("Content-Disposition: attachment; filename=\"$name\"");
-			header("Content-Length: " . filesize($this->filesFolder . $att[0]));
+			header("Content-Length: " . filesize($att[0]));
 			
-			$fp = fopen($this->filesFolder . $att[0], "r");
+			$fp = fopen($att[0], "r");
 			$this->callOnDownloadStart($att[0]);
 			if($att[1] != 0)
 			{
@@ -80,6 +79,19 @@ class sha1base_network extends sha1base
 	function callOnDownloadFinish($hash, $status)
 	{
 		
+	}
+	
+	function getIp()
+	{
+		$ip = '0.0.0.0';
+		if ( isset($_SERVER["REMOTE_ADDR"]) )    {
+			$ip = $_SERVER["REMOTE_ADDR"];
+		} elseif ( isset($_SERVER["HTTP_X_FORWARDED_FOR"]) )    {
+			$ip = $_SERVER["HTTP_X_FORWARDED_FOR"];
+		} elseif ( isset($_SERVER["HTTP_CLIENT_IP"]) )    {
+			$ip = $_SERVER["HTTP_CLIENT_IP"];
+		}
+		return $ip;
 	}
 }
 

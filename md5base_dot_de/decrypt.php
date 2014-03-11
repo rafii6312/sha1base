@@ -10,7 +10,7 @@ $m->loadModule('s1b_filesystem', 'sha1base_filesystem');
 $m->loadModule('s1b_network', 'sha1base_network');
 $m->loadModule('s1b_media', 'sha1base_media');
 $m->loadModule('s1b_encrypt', 'sha1base_encrypt');
-
+$m->loadModule('s1b_sqlite', 'sha1base_sqlite');
 
 if(isset($_POST['id']) AND isset($_POST['pass']))
 {
@@ -52,6 +52,10 @@ if(isset($_POST['id']) AND isset($_POST['pass']))
 			echo 'error while decrypting!';
 			exit;
 		}
+		$t = time();
+		$ip = $m->cEF('sha1base_network', 'getIp');
+		$m->cEF('sha1base_sqlite', 'loadDb', '../logging/stats.db');
+		$m->cEF('sha1base_sqlite', 'query', "INSERT INTO stats_dl (id, ip, date) VALUES ('$id', '$ip', '$t')");
 		if(file_exists($dec)) $m->cEF('sha1base_network', 'startDl', array($dec, $maxDownloadSpeed, $filename));
 		@unlink($dec);
 		

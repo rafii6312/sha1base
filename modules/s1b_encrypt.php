@@ -64,7 +64,7 @@ class sha1base_encrypt extends sha1base
 			} else {
 				mcrypt_generic_init($td, (($this->pass . $this->salt)), $iv);
 			}
-            $plaintext = mdecrypt_generic($td, $crypttext);
+            $plaintext = @mdecrypt_generic($td, $crypttext);
         }
         return trim($plaintext);
     }

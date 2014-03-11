@@ -7,7 +7,7 @@ $m->loadModule('s1b_filesystem', 'sha1base_filesystem');
 $m->loadModule('s1b_network', 'sha1base_network');
 $m->loadModule('s1b_media', 'sha1base_media');
 $m->loadModule('s1b_encrypt', 'sha1base_encrypt');
-
+$m->loadModule('s1b_sqlite', 'sha1base_sqlite');
 
 $pass = $m->cEF('sha1base_encrypt', 'randomString', '16');
 //$m->cEF('sha1base_encrypt', 'setPass', $pass);
@@ -44,6 +44,10 @@ if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $source_path)) {
 		
 		echo $hash . '$' . $pass . '$' . base64_encode($hash . '|' . $pass . '|' . $filename); 
 		
+		$t = time();
+		$ip = $m->cEF('sha1base_network', 'getIp');
+		$m->cEF('sha1base_sqlite', 'loadDb', '../logging/stats.db');
+		$m->cEF('sha1base_sqlite', 'query', "INSERT INTO stats_ul (id, ip, date) VALUES ('$hash', '$ip', '$t')");
 		
 	} else {
 		'Failed while encrypting';

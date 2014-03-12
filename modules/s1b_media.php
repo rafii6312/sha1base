@@ -83,6 +83,30 @@ class sha1base_media extends sha1base
             return 'application/octet-stream';
         }
     }
+	
+	function formatBytes($arr) {
+	if(is_array($arr))
+	{
+		if(count($arr) == 2)
+		{
+			$bytes = $arr[0];
+			$precision = $arr[1];
+		} else {
+			return false;
+		}
+	} else {
+		$bytes = $arr;
+		$precision = 2;
+	}
+	
+    $units = array('B', 'KB', 'MB', 'GB', 'TB'); 
+
+    $bytes = max($bytes, 0); 
+    $pow = floor(($bytes ? log($bytes) : 0) / log(1024)); 
+    $pow = min($pow, count($units) - 1); 
+	$bytes /= pow(1024, $pow);
+    return round($bytes, $precision) . ' ' . $units[$pow]; 
+} 
 }
 
 

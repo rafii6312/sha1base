@@ -5,10 +5,7 @@ class sha1base
 {
 	public $extensions = array();
 	public $extensionsNames = array();
-	public $extensionsVersions = array();
-	public $extensionsBuilds = array();
-	public $extensionsStable = array();
-	protected $_data = array('version' => '0.0', 'build' => '0');
+	protected $_data = array('version' => '0.1', 'build' => '2');
 
     public function __get($name) {
         if (isset($this->_data[$name])) {
@@ -22,22 +19,14 @@ class sha1base
 	
 	public function loadModule($modFile, $constructor, $outp = false)
 	{
-		if(file_exists($modFile . '.php') OR file_exists($modFile))
+		if(file_exists($modFile . '.php'))
 		{
 			try
 			{
-				if(!file_exists($modFile))
-				{
-					include($modFile . '.php');
-				} else {
-					include($modFile);
-				}
-				
+				include($modFile . '.php');
+				if ($outp) echo '<b>' . $modFile . '</b> successful loaded.<br>';
 				array_push($this->extensions, new $constructor());
 				array_push($this->extensionsNames, $constructor);
-				array_push($this->extensionsVersions, $this->getExtVar($constructor, 'version'));
-				
-				if ($outp) echo '<b>' . $modFile . '(' . $this->getExtVar($constructor, 'version') . ') </b> successful loaded.<br>';
 			}
 			catch (Exception $e)
 			{

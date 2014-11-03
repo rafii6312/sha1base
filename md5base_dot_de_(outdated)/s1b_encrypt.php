@@ -2,10 +2,6 @@
 
 class sha1base_encrypt extends sha1base
 {
-	public $version = '0.9';
-	public $build = '1';
-	public $stable = false;
-	
 	public $encryption = MCRYPT_RIJNDAEL_256;
 	public $mode = MCRYPT_MODE_CBC;
     public $pass = 'default';
@@ -14,6 +10,7 @@ class sha1base_encrypt extends sha1base
 	public $useMD5 = false;
 	public $bufferSize = 1024; //67108864
 	public $bufferSizeOut = 1408; //64 mb
+	
 	
 	public function __construct()
 	{
@@ -67,7 +64,7 @@ class sha1base_encrypt extends sha1base
 			} else {
 				mcrypt_generic_init($td, (($this->pass . $this->salt)), $iv);
 			}
-            $plaintext = @mdecrypt_generic($td, $crypttext);
+            $plaintext = mdecrypt_generic($td, $crypttext);
         }
         return trim($plaintext);
     }

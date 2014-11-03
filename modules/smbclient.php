@@ -1,138 +1,16 @@
 <?php
-
-class sha1base_network extends sha1base
-{
-	public $maxDl; //max download speed in B/s
-	public $maxUploadSize; //max upload size in bytes
-	public $smbc = null; //smb client
-	
-	public $whitelist = array();
-	public $useWhitelist = true;
-	
-	public function __construct()
-	{
-
-	}
-	
-	public function ping($host)
-	{
-		$starttime = microtime(true);
-		$file      = @fsockopen (parse_url($host, PHP_URL_HOST), 80, $errno, $errstr, 10);
-		$stoptime  = microtime(true);
-		$status    = 0;
-
-		if (!$file) $status = false;
-		else {
-			fclose($file);
-			$status = ($stoptime - $starttime) * 1000;
-			$status = floor($status);
-		}
-		return $status;
-	}
-	
-	public function connectSmb($att)
-	{
-		$smbc = new smbclient ($att[0], $att[1], $att[2]);
-		return true;
-	}
-	
-	public function startDl($att)
-	{
-		if(file_exists($att[0]) AND ($att[0] != ''))
-		{
-			// 0) filename
-			// 1) speed in byte/sec
-			// 2) name shown
-			//$name = $this->callExtFunction('sha1base_filesystem', 'getName', $att[0]);
-			$name = $att[2];
-			$type = $this->callExtFunction('sha1base_media', 'mime_content_type', $att[0]);
-			header("Content-Type: $type");
-			header("Content-Disposition: attachment; filename=\"$name\"");
-			if(isset($att[3]))
-			{
-				header("Content-Length: " . $att[3]);
-			} else {
-				header("Content-Length: " . filesize($att[0]));
-			}
-			$fp = fopen($att[0], "r");
-			$this->callOnDownloadStart($att[0]);
-			if($att[1] != 0)
-			{
-				$sleepTime = (65536 * 1000000) / ($att[1]);
-			} else {
-				$sleepTime = (65536 * 1000000) / ($this->maxDl);
-			}
-			while (!feof($fp))
-			{
-				echo fread($fp, 65536); //64kb parts
-				flush();
-				usleep($sleepTime); //wait after each 64kb. 2000000 = 2 sec
-				$this->callOnDownloadChunk($att[0]);
-			}
-			fclose($fp);
-			$this->callOnDownloadFinish($att[0], 1);
-			return true;
-		} else {
-			$this->callOnDownloadFinish($att[0], 2);
-			return false;
-		}
-	}
-
-	
-	function callOnDownloadChunk($hash)
-	{
-		
-	}
-	
-	function callOnDownloadStart($hash)
-	{
-	
-	}
-	
-	function callOnDownloadFinish($hash, $status)
-	{
-		
-	}
-	
-	function isWhitelisted($ip)
-	{
-		if($this->useWhitelist == false) return true;
-		if(in_array($ip, $this->whitelist))
-		{
-			return true;
-		} else {
-			return false;
-		}
-	}
-	
-	function addWhitelist($ip)
-	{
-		if(!$this->isWhitelisted($ip))
-		{
-			array_push($this->whitelist, $ip);
-		}
-	}
-	
-	function getIp()
-	{
-		$ip = '0.0.0.0';
-		if ( isset($_SERVER["REMOTE_ADDR"]) )    {
-			$ip = $_SERVER["REMOTE_ADDR"];
-		} elseif ( isset($_SERVER["HTTP_X_FORWARDED_FOR"]) )    {
-			$ip = $_SERVER["HTTP_X_FORWARDED_FOR"];
-		} elseif ( isset($_SERVER["HTTP_CLIENT_IP"]) )    {
-			$ip = $_SERVER["HTTP_CLIENT_IP"];
-		}
-		if($ip == '::1') $ip = '127.0.0.1';
-		return $ip;
-	}
-	
-	
-}
-
-
-
-
+/**
+ * Class for interacting with an SMB server using the system command "smbclient".
+ * Of course this assumes that you have the smbclient executable installed and
+ * in your path.
+ * 
+ * It is not the most efficient way of interacting with an SMB server -- for instance,
+ * putting multiple files involves running the executable multiple times and
+ * establishing a connection for each file.  However, if performance is not an
+ * issue, this is a quick-and-dirty way to move files to and from the SMB
+ * server from PHP.
+ *
+ */
 class smbclient
 {
     private $_service;
@@ -325,22 +203,6 @@ class smbclient
         }
     }
 }
-
-/*
-
-$smbc = new smbclient ('//10.0.1.1/example', 'exampleuser', 'examplepassword');
-
-if (!$smbc->get ('path/to/desired/file.txt', '/tmp/localfile.txt'))
-{
-    print "Failed to retrieve file:\n";
-    print join ("\n", $smbc->get_last_stdout());
-}
-else
-{
-    print "Transferred file successfully.";
-}
-
-*/
 
 
 ?>

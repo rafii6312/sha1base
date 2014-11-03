@@ -5,6 +5,10 @@ class sha1base_mysql extends sha1base
 {
 	public $mysql_db = null;
 	
+	public $version = '0.1';
+	public $build = '1';
+	public $stable = false;
+	
 	public function __construct()
 	{
 		
